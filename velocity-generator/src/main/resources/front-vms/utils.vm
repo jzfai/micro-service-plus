@@ -1,0 +1,3 @@
+#macro(fucTest $list)
+    $list
+#end

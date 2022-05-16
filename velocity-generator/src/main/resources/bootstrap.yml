@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active: @activatedProperties@
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        namespace: @nacosNamespace@
+        group: @nacosGroup@
+        username: @nacosUsername@
+        password: @nacosPassword@
+        server-addr: @nacosIpPort@
+        prefix: @project.artifactId@
+        file-extension: yml
+        # 用于共享的配置文件
+        shared-configs:
+        - data-id: application-main.yml
+          group: @nacosGroup@
+          refresh: true
+        extension-configs:
+        - data-id: @project.artifactId@.yml
+          group: @nacosGroup@
+          refresh: true
+        - data-id: application-rabbit.yml
+          group: @nacosGroup@
+          refresh: true
+        - data-id: application-redis.yml
+          group: @nacosGroup@
+          refresh: true
+        - data-id: application-db.yml
+          group: @nacosGroup@
+          refresh: true
+          #get seata config need after db config
+        - data-id: application-seata.yml
+          group: @nacosGroup@
+          refresh: true
+      discovery:
+        namespace: @nacosNamespace@
+        group: @nacosGroup@
+        username: @nacosUsername@
+        password: @nacosPassword@
+        server-addr: @nacosIpPort@
+        weight: @nacosWeight@
+
+
+
+server:
+  port: ${envpt.tomcatPortPre}0108
