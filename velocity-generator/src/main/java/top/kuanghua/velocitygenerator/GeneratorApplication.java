@@ -1,6 +1,5 @@
-package top.kuanghua.integrationfront;
+package top.kuanghua.velocitygenerator;
 
-import io.seata.spring.annotation.datasource.EnableAutoDataSourceProxy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

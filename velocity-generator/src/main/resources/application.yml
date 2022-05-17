@@ -1,0 +1,3 @@
+spring:
+  velocity:
+    resourceloaderpath:classpath:/front-vms

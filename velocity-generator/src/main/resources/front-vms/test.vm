@@ -1,4 +1,5 @@
-#parse("front-vms/utils.vm")
+#parse("./utils.vm")
+#parse("./zgj/zgj-test.vm")
 当前时间 : $date.get('yyyy-MM-dd HH:mm:ss')
 
 ###set($str = "hello world")
