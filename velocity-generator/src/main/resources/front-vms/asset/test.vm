@@ -1,0 +1,12 @@
+##根据数组某个key分组
+#macro(groupArrByKey $arrs $group_key)
+    #set($gabkMap={})
+    #set($gabkRes={})
+    #foreach($ai in $arrs)
+        #if(!$!gabkMap[$ai[$group_key]])
+            #set($gabkMap[$ai[$group_key]] = [$ai])
+        #else
+            #set($gabkMap[$ai[$group_key]][-1] = [$ai])
+        #end
+    #end
+#end

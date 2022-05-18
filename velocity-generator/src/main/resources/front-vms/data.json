@@ -1,0 +1,73 @@
+{
+  "commonConfig": {
+    "name": "型号",
+    "idKey": "id"
+  },
+  "apiConfig": {
+    "queryApi": "/standingbook/api/v1.0/assert/model/listPaged/",
+    "queryMethod": "get",
+    "addApi": "/standingbook/api/v1.0/assert/model/saveStationModel",
+    "addMethod": "post",
+    "updateApi": "",
+    "updateMethod": "update",
+    "deleteApi": "",
+    "deleteMethod": "delete",
+    "detailApi": "/standingbook/api/v1.0/assert/model/getStationModelDetail/",
+    "detailMethod": "get"
+  },
+  "queryConfig": [
+    {
+      "key": "name",
+      "label": "型号",
+      "inputType": "input"
+    }
+  ],
+  "tableConfig": [
+    {
+      "key": "name",
+      "label": "型号名称",
+      "minWidth": 100
+    },
+    {
+      "key": "cdUnitAmount",
+      "label": "充电仓位数(个)",
+      "minWidth": 140
+    },
+    {
+      "key": "carTypeQuantity",
+      "label": "可兼容车型(种)",
+      "minWidth": 140
+    },
+    {
+      "key": "remark",
+      "label": "备注",
+      "minWidth": 200
+    }
+  ],
+  "formConfig": [
+    {
+      "key": "name",
+      "label": "型号名称",
+      "inputType": "input",
+      "rule": "notEmpty"
+    },
+    {
+      "key": "cdUnitAmount",
+      "label": "充电仓数(个)",
+      "inputType": "input",
+      "rule": "positiveInteger"
+    },
+    {
+      "key": "carTypeList",
+      "label": "可兼容车型",
+      "inputType": "mst",
+      "rule": "notEmpty"
+    },
+    {
+      "key": "remark",
+      "label": "备注",
+      "inputType": "textarea",
+      "rule": ""
+    }
+  ]
+}
