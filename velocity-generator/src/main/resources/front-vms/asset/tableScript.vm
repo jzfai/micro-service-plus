@@ -1,0 +1,35 @@
+##表格的列数据
+#macro(tableColumn $config)
+cols:[
+    #foreach($item in $tableConfig)
+        #if($foreach.count==1)
+        {
+        label: '$item.desc',
+        prop: '$item.field',
+        'min-width': $item.minWidth,
+        align: 'left'
+        },
+        #else
+        {
+        label: '$item.desc',
+        prop: '$item.field',
+        'min-width': $item.minWidth,
+        },
+        #end
+
+    #end
+],
+#end
+##请求表格数据
+#macro(tableDataReq $config)
+this.$request('${apiConfig.queryPageApi}', {
+data: listQuery,
+methods: "${apiConfig.queryPageApiType}"
+})
+.then((response) => {
+this.dataSource.data = response.data
+this.dataSource.pageData.total = response.total
+})
+.catch(() => {
+})
+#end

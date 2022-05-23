@@ -1,0 +1,10 @@
+##表单数据
+#macro(rulesData $config)
+    #foreach($item in $formConfig)
+        #if($item.rule=="notEmpty")
+            $item.field:{required: true,message:"请输入${item.desc}",trigger:["blur", "change"]},
+        #elseif ($item.rule=="positiveInteger")
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "充电仓数为正整数",trigger: "blur",}],
+        #end
+    #end
+#end

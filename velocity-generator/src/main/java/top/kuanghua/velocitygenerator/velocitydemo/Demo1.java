@@ -21,13 +21,15 @@ public class Demo1 {
         String string = FrontVmsUtils.readFileToString("front-vms/data.json");
         Map<String, Object> jsonData = JSON.parseObject(string, Map.class);
 
+        System.out.println(jsonData.toString());
         Context context = FrontVmsUtils.getVelocityContext();
         // 设置变量
+        Map<String, Object> editPageConfig = JSON.parseObject(jsonData.get("editPageConfig").toString(), Map.class);
         context.put("apiConfig", jsonData.get("apiConfig"));
-        context.put("queryConfig", jsonData.get("queryConfig"));
-        context.put("tableConfig", jsonData.get("tableConfig"));
-        context.put("formConfig", jsonData.get("formConfig"));
-        context.put("commonConfig", jsonData.get("commonConfig"));
+        context.put("queryConfig", jsonData.get("searchConditionConfigs"));
+        context.put("tableConfig", jsonData.get("dataTablePageConfig"));
+        context.put("formConfig", editPageConfig.get("editFieldConfigs"));
+        context.put("commonConfig", jsonData.get("editPageConfig"));
         Template template = FrontVmsUtils.getAssetTemplate("index.vm");
         FileWriter fileWriter = new FileWriter(FrontVmsUtils.exportVmsPath() + "index.vue");
         template.merge(context, fileWriter);

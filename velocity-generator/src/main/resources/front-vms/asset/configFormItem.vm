@@ -1,5 +1,5 @@
 #macro(configFormItem $config)
-    #if($config.inputType=="input")
+    #if($config.componentConfig.componentType=="input")
     <el-form-item label="型号名称" prop="name">
         <el-input
                 v-model="formData.name"
@@ -9,7 +9,7 @@
         />
     </el-form-item>
 
-    #elseif($config.inputType=="select")
+    #elseif($config.componentConfig.componentType=="select")
     <el-form-item label="可兼容车型" prop="carTypeList">
         <multi-special-tag
                 v-model="formData.carTypeList"
@@ -19,7 +19,7 @@
         />
     </el-form-item>
 
-    #elseif($config.inputType=="textarea")
+    #elseif($config.componentConfig.componentType=="textarea")
     <el-form-item label="备注" prop="remark">
         <el-input
                 v-model="formData.remark"

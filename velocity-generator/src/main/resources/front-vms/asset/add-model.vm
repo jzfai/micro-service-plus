@@ -8,40 +8,7 @@
                     label-position="left"
                     label-width="100px"
             >
-                #foreach($item in $formConfig)
-                    #if($item.inputType=="input")
-                        <el-form-item label="${item.label}" prop="${item.key}">
-                            <el-input
-                                    v-model="formData.${item.key}"
-                                    maxlength="16"
-                                    clearable
-                                    placeholder="请输入${item.label}"
-                            />
-                        </el-form-item>
-                    #elseif($item.inputType=="mst")
-                        <el-form-item label="${item.label}" prop="${item.key}">
-                            <multi-special-tag
-                                    v-model="formData.${item.key}"
-                                    dict-code="carTypeEnum"
-                                    placeholder="请选择${item.label}"
-                                    type="carType"
-                            />
-                        </el-form-item>
-                    #elseif($item.inputType=="textarea")
-                        <el-form-item label="${item.label}" prop="${item.key}">
-                            <el-input
-                                    v-model="formData.${item.key}"
-                                    type="textarea"
-                                    maxlength="100"
-                                    show-word-limit
-                                    autosize
-                                    resize="none"
-                                    clearable
-                                    placeholder="请输入${item.label}..."
-                            />
-                        </el-form-item>
-                    #end
-                #end
+
             </el-form>
         </div>
         <div slot="footer" class="footers">
@@ -67,29 +34,43 @@
                 successStatus: false,
                 formData: {
                     id: "",
-                    #foreach($item in $formConfig)
-                            $item.key: "",
-                    #end
+            #foreach($item in $formConfig)
+                $item.field:
+                "",
+            #end
 
-                },
-                carModelOptions: [],
-                rules: {
-                    #foreach($item in $formConfig)
-                        #if($item.rule=="notEmpty")
-                                $item.key: {required: true, message: "请输入${item.label}", trigger: ["blur", "change"]},
-                        #elseif ($item.rule=="positiveInteger")
-                                $item.key: [
-                                {required: true, message: "请输入${item.label}", trigger: "blur"},
-                                {
-                                    pattern: /^[1-9]\d*$/,
-                                    message: "充电仓数为正整数",
-                                    trigger: "blur",
-                                },
-                            ],
-                        #end
+        },
+            carModelOptions: [],
+                    rules
+        :
+            {
+                #foreach($item in $formConfig)
+                    #if($item.rule=="notEmpty")
+                        $item.field:
+                        {
+                            required: true, message
+                        :
+                            "请输入${item.desc}", trigger
+                        :
+                            ["blur", "change"]
+                        }
+                    ,
+                    #elseif ($item.rule=="positiveInteger")
+                        $item.field:
+                        [
+                            {required: true, message: "请输入${item.desc}", trigger: "blur"},
+                            {
+                                pattern: /^[1-9]\d*$/,
+                                message: "充电仓数为正整数",
+                                trigger: "blur",
+                            },
+                        ],
                     #end
-                },
-            };
+                #end
+            }
+        ,
+        }
+            ;
         },
         watch: {
             dialogValue: {
@@ -97,7 +78,7 @@
                     if (newData && newData.status) {
                         this.title = newData.title;
                         this.successStatus = false;
-                        if (this.title === "${commonConfig.name}详情}") {
+                        if (this.title === "${commonConfig.title}详情}") {
                             // 编辑
                             this.formData.${commonConfig.idKey} = newData.value.${commonConfig.idKey};
                             this.getStationModelDetail(newData.value.${commonConfig.idKey});
@@ -112,10 +93,12 @@
                 if (!newData) {
                     this.formData = {
                         id: "",
-                        #foreach($item in $formConfig)
-                                $item.key: "",
-                        #end
-                    };
+                    #foreach($item in $formConfig)
+                        $item.field:
+                        "",
+                    #end
+                }
+                    ;
                     this.$refs.ruleForm.resetFields();
                     this.$emit("refresh", this.successStatus);
                 }
@@ -154,10 +137,10 @@
             // 获取换电站型号详情
             getStationModelDetail(id) {
                 this.$request(
-                        "${apiConfig.detailApi}" + id,
+                        "${apiConfig.infoApi}" + id,
                         {
                             // params: params,
-                            method: "${apiConfig.detailMethod}",
+                            method: "${apiConfig.infoApiType}",
                         }
                 )
                         .then((response) => {
@@ -177,10 +160,10 @@
                         const params = this.formData
                         //此处提交数据的具体逻辑无法处理，默认只是提交formData里的数据，如果需要处理数据请自己处理
                         this.$request(
-                                "${apiConfig.addApi}",
+                                "${apiConfig.insertApi}",
                                 {
-                                    data: params,
-                                    methods: "${apiConfig.addMethod}"
+                                    data: this.formData,
+                                    methods: "${apiConfig.insertApiType}"
                                 }
                         ).then((response) => {
                             if (response.code === "200") {
