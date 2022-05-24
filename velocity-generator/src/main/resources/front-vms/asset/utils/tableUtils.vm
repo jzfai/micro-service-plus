@@ -1,6 +1,5 @@
-##表格的列数据
-#macro(tableColumn $config)
-cols:[
+##表格列项
+#macro(tableColumn)
     #foreach($item in $tableConfig)
         #if($foreach.count==1)
         {
@@ -18,10 +17,9 @@ cols:[
         #end
 
     #end
-],
 #end
 ##请求表格数据
-#macro(tableDataReq $config)
+#macro(tableDataReq)
 this.$request('${apiConfig.queryPageApi}', {
 data: listQuery,
 methods: "${apiConfig.queryPageApiType}"

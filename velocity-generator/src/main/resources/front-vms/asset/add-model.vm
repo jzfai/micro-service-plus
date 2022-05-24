@@ -1,3 +1,4 @@
+#parse("utils/formUtils.vm")
 <template>
     <Dialog :title="title" :width="'50%'" :status="status" @close="handleClose">
         <div slot="content" class="content add-model">
@@ -8,7 +9,7 @@
                     label-position="left"
                     label-width="100px"
             >
-
+                #formTemp()
             </el-form>
         </div>
         <div slot="footer" class="footers">
@@ -33,44 +34,11 @@
                 title: "",
                 successStatus: false,
                 formData: {
-                    id: "",
-            #foreach($item in $formConfig)
-                $item.field:
-                "",
-            #end
-
-        },
-            carModelOptions: [],
-                    rules
-        :
-            {
-                #foreach($item in $formConfig)
-                    #if($item.rule=="notEmpty")
-                        $item.field:
-                        {
-                            required: true, message
-                        :
-                            "请输入${item.desc}", trigger
-                        :
-                            ["blur", "change"]
-                        }
-                    ,
-                    #elseif ($item.rule=="positiveInteger")
-                        $item.field:
-                        [
-                            {required: true, message: "请输入${item.desc}", trigger: "blur"},
-                            {
-                                pattern: /^[1-9]\d*$/,
-                                message: "充电仓数为正整数",
-                                trigger: "blur",
-                            },
-                        ],
-                    #end
-                #end
+                    #fromDataProp()
+                },
+                carModelOptions: [],
+                rules: {#rulesData()}
             }
-        ,
-        }
-            ;
         },
         watch: {
             dialogValue: {
@@ -91,14 +59,7 @@
             },
             status(newData) {
                 if (!newData) {
-                    this.formData = {
-                        id: "",
-                    #foreach($item in $formConfig)
-                        $item.field:
-                        "",
-                    #end
-                }
-                    ;
+                    this.formData = {#fromDataProp()};
                     this.$refs.ruleForm.resetFields();
                     this.$emit("refresh", this.successStatus);
                 }
@@ -136,42 +97,15 @@
 
             // 获取换电站型号详情
             getStationModelDetail(id) {
-                this.$request(
-                        "${apiConfig.infoApi}" + id,
-                        {
-                            // params: params,
-                            method: "${apiConfig.infoApiType}",
-                        }
-                )
-                        .then((response) => {
-                            this.formData = response.data;
-                            this.status = true;
-                        })
-                        .catch(() => {
-                        });
+                #infoReq()
             },
-
             // 保存操作
             handleSubmit() {
                 // 校验必填
                 const refForm = this.$refs.ruleForm
                 refForm.validate((valid) => {
                     if (valid) {
-                        const params = this.formData
-                        //此处提交数据的具体逻辑无法处理，默认只是提交formData里的数据，如果需要处理数据请自己处理
-                        this.$request(
-                                "${apiConfig.insertApi}",
-                                {
-                                    data: this.formData,
-                                    methods: "${apiConfig.insertApiType}"
-                                }
-                        ).then((response) => {
-                            if (response.code === "200") {
-                                this.$message.success("保存成功");
-                                this.status = false;
-                                this.successStatus = true;
-                            }
-                        });
+                        #insertReq()
                     }
                 });
             },

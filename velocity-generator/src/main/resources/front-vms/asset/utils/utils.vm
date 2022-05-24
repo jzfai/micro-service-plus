@@ -1,0 +1,22 @@
+##根据数组某个key分组
+#macro(groupArrByKey $arrs $group_key)
+    #set($gabkMap={})
+    #foreach($ai in $arrs)
+        #if(!$!gabkMap[$ai[$group_key]])
+            #set($gabkMap[$ai[$group_key]] = [$ai])
+        #else
+            #set($gabkMap[$ai[$group_key]][-1] = [$ai])
+        #end
+    #end
+#end
+##根据数组某个deep key分组
+#macro(groupArrByDeepKey $arrs $group_key $group_deep_key)
+    #set($gabkDeepMap={})
+    #foreach($ai in $arrs)
+        #if(!$!gabkDeepMap[$ai[$group_key][$group_deep_key]])
+            #set($gabkDeepMap[$ai[$group_key][$group_deep_key]] = [$ai])
+        #else
+            #set($gabkDeepMap[$ai[$group_key][$group_deep_key]][-1] = [$ai])
+        #end
+    #end
+#end

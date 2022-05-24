@@ -1,0 +1,16 @@
+#parse("utils/utils.vm")
+#groupArrByDeepKey($queryConfig,"componentConfig","componentType")
+##生成查询表单数据
+#macro(filterData)
+    #foreach($entry in $gabkDeepMap.entrySet())
+        $entry.key:[
+        #foreach($item in $entry.value)
+        {
+        label: '$item.desc',
+        key: '$item.field',
+        placeholder: '请输入$!{item.lable}名称'
+        },
+        #end
+    ],
+    #end
+#end

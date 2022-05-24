@@ -1,5 +1,5 @@
-#parse("test.vm")
-#groupArrByKey($queryConfig,"inputType")
+#parse("utils/queryUtils.vm")
+#parse("utils/tableUtils.vm")
 <template>
     <div class="app-container model-container">
         <filter-pane ref="filterPane" :filter-data="filterData" @handleFilterMsg="handleFilterMsg"/>
@@ -22,131 +22,82 @@
                 // 搜索栏配置
                 filterData: {
                     labelWidth: '40px',
-            #foreach($entry in $gabkMap.entrySet())
-                $entry.field:
-                [
-                    #foreach($item in $entry.value)
+                    #filterData()
+                },
+                // 表格配置
+                dataSource: {
+                    // 1、功能区-按钮
+                    tool: [
                         {
-                            label: '$item.desc', // label
-                            key: '$item.field', // 字段名
-                            placeholder: '请输入$!{item.lable}名称' // 提示语
+                            name: '新建型号',
+                            handleClick: this.handleAdd
                         },
-
-                    #end
-                ],
-            #end
-
-        },
-            // 表格配置
-            dataSource: {
-                // 1、功能区-按钮
-                tool: [
-                    {
-                        name: '新建型号',
-                        handleClick: this.handleAdd
-                    },
-                    {
-                        component: 'Drag' // 配置列表设置组件
-                    }
-                ],
-                        // 2、表格数据
-                        data
-            :
-                [],
-                        // 3、表格的列数据
-                        cols
-            :
-                [
-                    #foreach($item in $tableConfig)
-                        #if($foreach.count==1)
-                            {
-                                label: '$item.desc',
-                                prop: '$item.field',
-                                'min-width': $item.minWidth,
-                                align: 'left'
-                            },
-                        #else
-                            {
-                                label: '$item.desc',
-                                prop: '$item.field',
-                                'min-width': $item.minWidth,
-                            },
-                        #end
-
-                    #end
-                ],
-                        // 4、分页数据
-                        pageData
-            :
-                {
-                    total: 0, // 总条数
-                            pageSize
-                :
-                    10, // 每页数量
-                            pageIndex
-                :
-                    1 // 页码
-                }
-            ,
-                // 表格的列数据相关交互
-                isSelection: false, // 表格有多选时设置
-                        selectable
-            :
-
-                function (val) {
-                    // 禁用部分行多选
-                    if (val.hideFlag === 1) {
-                        return false
-                    } else {
-                        return true
-                    }
-                }
-
-            ,
-                handleSelectionChange: (val) => {
-                }, // 点击行选中多选返回选中数组
-                        isIndex
-            :
-                false, // 列表序号
-                        isLoading
-            :
-                false, // loading
-                        isOperation
-            :
-                true, // 表格有操作列时设置
-                        operation
-            :
-                {
-                    // 表格有操作列时设置
-                    label: '操作', // 列名
-                            width
-                :
-                    '100', // 根据实际情况给宽度
-                            data
-                :
-                    [
                         {
-                            label: '详情',
-                            handleRow: this.handleDetail
+                            component: 'Drag' // 配置列表设置组件
                         }
-                    ]
+                    ],
+                    // 2、表格数据
+                    data: [],
+                    // 3、表格的列数据
+                    cols: [#tableColumn()],
+                    // 4、分页数据
+                    pageData:
+                            {
+                                total: 0, // 总条数
+                                pageSize:
+                                        10, // 每页数量
+                                pageIndex:
+                                        1 // 页码
+                            }
+                    ,
+                    // 表格的列数据相关交互
+                    isSelection: false, // 表格有多选时设置
+                    selectable:
+
+                            function (val) {
+                                // 禁用部分行多选
+                                if (val.hideFlag === 1) {
+                                    return false
+                                } else {
+                                    return true
+                                }
+                            }
+
+                    ,
+                    handleSelectionChange: (val) => {
+                    }, // 点击行选中多选返回选中数组
+                    isIndex:
+                            false, // 列表序号
+                    isLoading:
+                            false, // loading
+                    isOperation:
+                            true, // 表格有操作列时设置
+                    operation:
+                            {
+                                // 表格有操作列时设置
+                                label: '操作', // 列名
+                                width:
+                                        '100', // 根据实际情况给宽度
+                                data:
+                                        [
+                                            {
+                                                label: '详情',
+                                                handleRow: this.handleDetail
+                                            }
+                                        ]
+                            }
+                }
+                ,
+                listQuery: {}
+                , // 搜索参数
+                addDialog: {
+                    status: false,
+                    title:
+                            '新建${commonConfig.title}',
+                    value:
+                            {}
                 }
             }
-        ,
-            listQuery: {
-            }
-        , // 搜索参数
-            addDialog: {
-                status: false,
-                        title
-            :
-                '新建${commonConfig.title}',
-                        value
-            :
-                {
-                }
-            }
-        }
         },
         // ------ 钩子函数，按生命周期排列 --------
         mounted() {
@@ -174,16 +125,7 @@
             },
             // 分页查询获取表格数据（包含埋点功能，若不需要则去除）
             handleFetchData(listQuery) {
-                this.$request('${apiConfig.queryPageApi}', {
-                    data: listQuery,
-                    methods: "${apiConfig.queryPageApiType}"
-                })
-                        .then((response) => {
-                            this.dataSource.data = response.data
-                            this.dataSource.pageData.total = response.total
-                        })
-                        .catch(() => {
-                        })
+                #tableDataReq()
             },
             // 新建型号
             handleAdd() {

@@ -1,0 +1,210 @@
+##生成form item
+#macro(formTemp)
+    #foreach($item in $formConfig)
+        #if($item.componentConfig.componentType=="input") ##输入框 input
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    maxlength="16"
+                    clearable
+                    placeholder="请输入${item.desc}"
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="textarea") ##多行文本框 textarea
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <multi-special-tag
+                    v-model="formData.${item.field}"
+                    dict-code="carTypeEnum"
+                    placeholder="请选择${item.desc}"
+                    type="carType"
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="radio") ##单选框 radio
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="checkbox") ##多选框 checkbox
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="switch") ##开关 switch
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="datePicker") ##日期选择 datePicker
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="timePicker") ##时间选择 timePicker
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="dateTimePicker") ##日期时间选择 dateTimePicker
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="upload") ##上传组件 upload
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="selectDict") ##字典通用选择器 selectDict
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="multiDict") ##字典多选选择器 multiDict
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #elseif($item.componentConfig.componentType=="specialDict") ##字典特殊选择器 specialDict
+        <el-form-item label="${item.desc}" prop="${item.field}">
+            <el-input
+                    v-model="formData.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    placeholder="请输入${item.desc}..."
+            />
+        </el-form-item>
+        #end
+    #end
+#end
+
+##生成form key
+#macro(fromDataProp)
+    $commonConfig.idKey:"",
+    #foreach($item in $formConfig)
+        $item.field:"",
+    #end
+#end
+
+
+##生成 rule校验
+#macro(rulesData)
+    #foreach($item in $formConfig)
+        #if($item.rule=="notNull")##必填
+            $item.field:{required: true,message:"请输入${item.desc}",trigger:["blur", "change"]},
+        #elseif ($item.rule=="number")##只允许输入数字
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #elseif ($item.rule=="positiveNumber")##只允许输入正数（允许带两位小数）
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #elseif ($item.rule=="positiveInteger")##只允许输入正整数
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #elseif ($item.rule=="arrayNotNull")##校验数组不为空
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #end
+    #end
+#end
+
+
+##生成详情请求接口
+#macro(infoReq)
+this.$request(
+`${apiConfig.infoApi}/id`,
+{method: "${apiConfig.infoApiType}",}
+).then((response) => {
+this.formData = response.data;
+this.status = true;
+}).catch(() => {
+});
+#end
+
+
+##生成保存请求接口
+#macro(insertReq)
+this.$request("${apiConfig.insertApi}",
+{
+data: this.formData,
+methods: "${apiConfig.insertApiType}"
+}
+).then((response) => {
+if (response.code === "200") {
+this.$message.success("保存成功");
+this.status = false;
+this.successStatus = true;
+}
+});
+#end

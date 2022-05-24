@@ -2,6 +2,7 @@ package top.kuanghua.velocitygenerator.velocitydemo;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import top.kuanghua.velocitygenerator.utils.FrontVmsUtils;
 
@@ -25,6 +26,7 @@ public class Demo1 {
         Context context = FrontVmsUtils.getVelocityContext();
         // 设置变量
         Map<String, Object> editPageConfig = JSON.parseObject(jsonData.get("editPageConfig").toString(), Map.class);
+
         context.put("apiConfig", jsonData.get("apiConfig"));
         context.put("queryConfig", jsonData.get("searchConditionConfigs"));
         context.put("tableConfig", jsonData.get("dataTablePageConfig"));
@@ -32,7 +34,9 @@ public class Demo1 {
         context.put("commonConfig", jsonData.get("editPageConfig"));
         Template template = FrontVmsUtils.getAssetTemplate("index.vm");
         FileWriter fileWriter = new FileWriter(FrontVmsUtils.exportVmsPath() + "index.vue");
-        template.merge(context, fileWriter);
+        VelocityContext context2 = new VelocityContext();
+        context.put("name", "zhangsan");
+        template.merge(context2, fileWriter);
         fileWriter.close();
 
         //第二个模板
