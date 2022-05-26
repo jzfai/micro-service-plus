@@ -1,0 +1,120 @@
+#parse("utils/formUtils.vm")
+<template>
+    <Dialog :title="title" :width="'50%'" :status="status" @close="handleClose">
+        <div slot="content" class="content add-model">
+            <el-form
+                    ref="ruleForm"
+                    :model="formData"
+                    :rules="rules"
+                    label-position="left"
+                    label-width="100px"
+            >
+                #formTemp()
+            </el-form>
+        </div>
+        <div slot="footer" class="footers">
+            <el-button size="small" @click="handleClose">取消</el-button>
+            <el-button type="primary" size="small" @click="handleSubmit">确定
+            </el-button>
+        </div>
+    </Dialog>
+</template>
+
+<script>
+    import Dialog from "@/components/dialog";
+
+    export default {
+        components: {Dialog},
+        props: {
+            dialogValue: Object,
+        },
+        data() {
+            return {
+                status: false,
+                title: "",
+                successStatus: false,
+                formData: {
+                    #fromDataProp()
+                },
+                carModelOptions: [],
+                rules: {#rulesData()}
+            }
+        },
+        watch: {
+            dialogValue: {
+                handler(newData) {
+                    if (newData && newData.status) {
+                        this.title = newData.title;
+                        this.successStatus = false;
+                        if (this.title === "${commonConfig.title}详情}") {
+                            // 编辑
+                            this.formData.${commonConfig.idKey} = newData.value.${commonConfig.idKey};
+                            this.getStationModelDetail(newData.value.${commonConfig.idKey});
+                        } else {
+                            // 新增
+                            this.status = newData.status;
+                        }
+                    }
+                },
+            },
+            status(newData) {
+                if (!newData) {
+                    this.formData = {#fromDataProp()};
+                    this.$refs.ruleForm.resetFields();
+                    this.$emit("refresh", this.successStatus);
+                }
+            },
+        },
+        mounted() {
+            this.getListCarModelBasicPage();
+        },
+        methods: {
+            // 关闭弹窗
+            handleClose() {
+                this.status = false;
+            },
+
+            // 获取车型列表
+            getListCarModelBasicPage() {
+                this.$request(
+                        "/standingbook/api/v1.0/assert/carModel/listCarModelBasicPage",
+                        {
+                            data: {pageIndex: 1, pageSize: 1000},
+                        }
+                )
+                        .then((response) => {
+                            this.carModelOptions = response.data.map((item) => {
+                                return {
+                                    modelName: item.modelName ? item.modelName : "-",
+                                    mfrsName: item.mfrsName ? item.mfrsName : "-",
+                                    id: item.${commonConfig.idKey},
+                                };
+                            });
+                        })
+                        .catch(() => {
+                        });
+            },
+
+            // 获取换电站型号详情
+            getStationModelDetail(id) {
+                #infoReq()
+            },
+            // 保存操作
+            handleSubmit() {
+                // 校验必填
+                const refForm = this.$refs.ruleForm
+                refForm.validate((valid) => {
+                    if (valid) {
+                        #insertReq()
+                    }
+                });
+            },
+        },
+    };
+</script>
+
+<style lang="scss" scoped>
+    .add-model {
+        padding-top: 24px;
+    }
+</style>

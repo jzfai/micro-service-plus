@@ -43,11 +43,11 @@
         </dependency>
 
         <!--canal依赖-->
-        <dependency>
-            <groupId>com.xpand</groupId>
-            <artifactId>starter-canal</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.xpand</groupId>-->
+            <!--<artifactId>starter-canal</artifactId>-->
+            <!--<version>0.0.1-SNAPSHOT</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>

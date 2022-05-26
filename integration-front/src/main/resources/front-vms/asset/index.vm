@@ -1,0 +1,159 @@
+#parse("utils/queryUtils.vm")
+#parse("utils/tableUtils.vm")
+<template>
+    <div class="app-container model-container">
+        <filter-pane ref="filterPane" :filter-data="filterData" @handleFilterMsg="handleFilterMsg"/>
+        <table-pane :data-source="dataSource" @changeSize="handleChangeSize" @changeNum="handleChangeNum"/>
+        <AddModels :dialog-value="addDialog" @refresh="handleRefresh"/>
+    </div>
+</template>
+
+<script>
+    import FilterPane from '@/components/table/filter-pane'
+    import TablePane from '@/components/table/table-pane'
+    import AddModels from './components/add-model.vue'
+    export default {
+        name: 'Model',
+        components: {FilterPane, TablePane, AddModels},
+        mixins: [],
+        data() {
+            return {
+                // 搜索栏配置
+                filterData: {
+                    labelWidth: '40px',
+                    #filterData()
+                },
+                // 表格配置
+                dataSource: {
+                    // 1、功能区-按钮
+                    tool: [
+                        {
+                            name: '新建型号',
+                            handleClick: this.handleAdd
+                        },
+                        {
+                            component: 'Drag' // 配置列表设置组件
+                        }
+                    ],
+                    // 2、表格数据
+                    data: [],
+                    // 3、表格的列数据
+                    cols: [#tableColumn()],
+                    // 4、分页数据
+                    pageData:
+                            {
+                                total: 0, // 总条数
+                                pageSize:
+                                        10, // 每页数量
+                                pageIndex:
+                                        1 // 页码
+                            }
+                    ,
+                    // 表格的列数据相关交互
+                    isSelection: false, // 表格有多选时设置
+                    selectable:
+
+                            function (val) {
+                                // 禁用部分行多选
+                                if (val.hideFlag === 1) {
+                                    return false
+                                } else {
+                                    return true
+                                }
+                            }
+
+                    ,
+                    handleSelectionChange: (val) => {
+                    }, // 点击行选中多选返回选中数组
+                    isIndex:
+                            false, // 列表序号
+                    isLoading:
+                            false, // loading
+                    isOperation:
+                            true, // 表格有操作列时设置
+                    operation:
+                            {
+                                // 表格有操作列时设置
+                                label: '操作', // 列名
+                                width:
+                                        '100', // 根据实际情况给宽度
+                                data:
+                                        [
+                                            {
+                                                label: '详情',
+                                                handleRow: this.handleDetail
+                                            }
+                                        ]
+                            }
+                }
+                ,
+                listQuery: {}
+                , // 搜索参数
+                addDialog: {
+                    status: false,
+                    title:
+                            '新建${commonConfig.title}',
+                    value:
+                            {}
+                }
+            }
+        },
+        // ------ 钩子函数，按生命周期排列 --------
+        mounted() {
+            this.$refs.filterPane.handleSearch()
+        },
+        methods: {
+            // 查询请求表格数据
+            handleFilterMsg(listQuery) {
+                this.listQuery = Object.assign(listQuery, {pageSize: 10, pageIndex: 1})
+                this.dataSource.pageData.pageSize = 10
+                this.dataSource.pageData.pageIndex = 1
+                this.handleFetchData(this.listQuery)
+            },
+            // 改变每页条数
+            handleChangeSize(pageSize) {
+                this.dataSource.pageData.pageSize = pageSize
+                Object.assign(this.listQuery, {pageSize})
+                this.handleFetchData(this.listQuery)
+            },
+            // 改变当前页码
+            handleChangeNum(pageIndex) {
+                this.dataSource.pageData.pageIndex = pageIndex
+                Object.assign(this.listQuery, {pageIndex})
+                this.handleFetchData(this.listQuery)
+            },
+            // 分页查询获取表格数据（包含埋点功能，若不需要则去除）
+            handleFetchData(listQuery) {
+                #tableDataReq()
+            },
+            // 新建型号
+            handleAdd() {
+                this.addDialog = {
+                    status: true,
+                    title: '新建${commonConfig.title}',
+                    value: {}
+                }
+            },
+            // 型号详情
+            handleDetail(index, row) {
+                this.addDialog = {
+                    status: true,
+                    title: '${commonConfig.title}详情',
+                    value: {
+                ${commonConfig.idKey}:
+                row.${commonConfig.idKey}
+            }
+            }
+            },
+
+            // 刷新数据
+            handleRefresh(val) {
+                if (val) {
+                    this.$refs.filterPane.handleReset()
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped></style>

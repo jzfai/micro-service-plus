@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tools>
+    <!--scope : 指定工具类的作用范围, 取值有三种 : application , request , session -->
+    <toolbox scope="application">
+        <tool key="number" class="org.apache.velocity.tools.generic.NumberTool"/>
+        <tool class="org.apache.velocity.tools.generic.DateTool" format="yyyy-MM-dd"/>
+    </toolbox>
+
+    <toolbox scope="request">
+
+    </toolbox>
+
+</tools>

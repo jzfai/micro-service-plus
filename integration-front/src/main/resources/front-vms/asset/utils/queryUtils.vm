@@ -1,0 +1,83 @@
+###parse("utils/utils.vm")
+##生成查询表单数据
+#macro(queryItem)
+    #foreach($item in $queryConfig)
+        #if($item.componentType=="input") ##input
+        <el-form-item  prop="${item.field}">
+            <el-input v-model="searchForm.${item.field}"  style="width:${item.width}px" placeholder="${item.desc}" />
+        </el-form-item>
+        #elseif($item.componentType=="select") ##select
+        <el-form-item  prop="${item.field}">
+            <el-select v-model="searchForm.${item.field}" clearable placeholder="${item.desc}"  style="width:${item.width}px">
+                #foreach($enum in $item.selectEnum)
+                    <el-option label="${enum.label}" value="${enum.value}" />
+                #end
+            </el-select>
+        </el-form-item>
+        #elseif($item.componentType=="selectApi") ##selectApi
+        <el-form-item  prop="${item.field}">
+            <el-select v-model="searchForm.${item.field}" clearable placeholder="${item.desc}"  style="width:${item.width}px">
+                #foreach($enum in $item.selectEnum)
+                    <el-option label="${enum.label}" value="${enum.value}" />
+                #end
+            </el-select>
+        </el-form-item>
+        #elseif($item.componentType=="cascader") ##cascader
+        <el-form-item label="${item.desc}">
+            <el-cascader :options="options" clearable filterable :show-all-levels="false" style="width:${item.width}px"/>
+        </el-form-item>
+        #elseif($item.componentType=="datetimerange") ##datetimerange
+        <el-form-item  prop="${item.field}">
+            <el-date-picker
+                    v-model="datetimerangePaking"
+                    type="datetimerange"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    @change="dateTimePacking"
+                    style="width:${item.width}px"
+                    range-separator="-"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="datetime") ##datetime
+        <el-form-item  prop="${item.field}">
+            <el-date-picker
+                    v-model="dateTimePacking"
+                    type="datetime"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    style="width:${item.width}px"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="date") ##date
+        <el-form-item  prop="${item.field}">
+            <el-date-picker
+                    v-model="datePacking"
+                    type="date"
+                    style="width:${item.width}px"
+            />
+        </el-form-item>
+        #end
+    #end
+#end
+
+
+##生成queryScript
+#macro(queryScript)
+    #foreach($item in $queryConfig)
+        #if($item.componentType=="selectApi")##selectApi
+        #elseif($item.componentType=="cascader") ##cascader
+        #elseif($item.componentType=="datetimerange") ##datetimerange
+        const dateTimePacking = (timeArr) => {
+            if (timeArr && timeArr.length === 2) {
+                searchForm.startTime = timeArr[0]
+                searchForm.endTime = timeArr[1]
+            } else {
+                searchForm.startTime = ''
+                searchForm.endTime = ''
+            }
+        }
+        #end
+    #end
+#end

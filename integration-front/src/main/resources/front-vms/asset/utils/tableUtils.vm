@@ -1,0 +1,119 @@
+##表格列项
+#macro(tableColumnItem)
+    <el-table-column type="selection" align="center" width="50" />
+    #foreach($item in $tableConfig)
+        #if($item.componentType=="input") ##input
+        <el-table-column align="center" prop="${item.field}" label="${item.desc}" min-width="${item.width}"/>
+        #elseif($item.componentType=="select") ##select
+        <el-table-column align="center" prop="${item.field}" label="${item.desc}" min-width="${item.width}" >
+            <template #default="{ row }">
+                #foreach($enum in $item.selectEnum)
+                    <el-option label="${enum.label}" value="${enum.value}"/>
+                    <span v-if="row.${item.desc}==${enum.value}">${enum.label}</span>
+                #end
+            </template>
+        </el-table-column>
+        #elseif($item.componentType=="image") ##image
+        <el-table-column align="center" prop="${item.field}" label="${item.desc}" min-width="${item.width}">
+            <template #default="{ row }">
+                <img :src="row.${item.field}"  style="border-radius:10px;width:${item.width}px;height:${item.width}px" />
+            </template>
+        </el-table-column>
+        #end
+    #end
+#end
+
+##请求表格数据
+#macro(selectPageReq)
+let selectPageReq = () => {
+    const data = Object.assign(searchForm, {
+        pageNum: pageNum.value,
+        pageSize: pageSize.value
+    })
+    let reqConfig = {
+        url: '${apiConfig.queryApi}',
+        method: '${apiConfig.queryApiType}',
+        data,
+        isParams: true
+    }
+    axiosReq(reqConfig).then((resData) => {
+        usertableData.value = resData.data?.records
+        totalPage = resData.data?.total
+    })
+}
+#end
+##删除相关
+#macro(deleteByIdReq)
+//删除单个
+let deleteByIdReq = (id) => {
+    return axiosReq({
+        url: '${apiConfig.deleteApi}',
+        data: { id: id },
+        isParams: true,
+        method: '${apiConfig.deleteApiType}',
+        bfLoading: true
+    })
+}
+let tableDelClick = (row) => {
+    elConfirm('确定', `您确定要删除【${row.name}】吗？`)
+    .then(() => {
+        deleteByIdReq(row.id).then(() => {
+        selectPageReq()
+        elMessage(`【${row.name}】删除成功`)
+    })
+    })
+    .catch(() => {})
+}
+#end
+##多个删除
+#macro(multiDelReq)
+//多个删除
+const refuserTable = ref(null)
+const multiDelBtnClick = () => {
+    let rowDeleteIdArr = []
+    let deleteNameTitle = ''
+    rowDeleteIdArr = multipleSelection.value.map((mItem) => {
+        deleteNameTitle = deleteNameTitle + mItem.name + ','
+        return mItem.id
+    })
+    if (rowDeleteIdArr.length === 0) {
+        elMessage('表格选项不能为空', 'warning')
+        return
+    }
+    let stringLength = deleteNameTitle.length - 1
+    elConfirm('删除', `您确定要删除【${deleteNameTitle.slice(0, stringLength)}】吗`)
+    .then(() => {
+        const data = rowDeleteIdArr
+        axiosReq({
+        url: `${apiConfig.deleteMultiApi}`,
+        data,
+        method: '${apiConfig.deleteMultiApiType}',
+        bfLoading: true
+        }).then((res) => {
+            elMessage('删除成功')
+            selectPageReq()
+        })
+    })
+    .catch(() => {})
+}
+#end
+##详情modal
+#macro(detailScript)
+let detailData = ref({})
+let { dialogTitle, detailDialog } = useElement()
+let tableDetailClick = (row) => {
+    dialogTitle.value = `详情【${row.name}】`
+    getDetailByIdReq(row.id).then((resData) => {
+    detailData.value = resData.data
+    detailDialog.value = true
+    })
+    }
+    let getDetailByIdReq = (id) => {
+    return axiosReq({
+        url: '${apiConfig.detailApi}',
+        data: { id },
+        isParams: true,
+        method: '${apiConfig.detailApiType}'
+    })
+}
+#end

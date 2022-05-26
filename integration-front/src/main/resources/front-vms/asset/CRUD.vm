@@ -1,0 +1,157 @@
+#parse("utils/queryUtils.vm")
+#parse("utils/tableUtils.vm")
+#parse("utils/utils.vm")
+<template>
+  <div class="scroll-y">
+    <!--操作-->
+    <div class="mr-3 rowSS">
+      <el-button type="primary" @click="addBtnClick">
+        <el-icon style="vertical-align: middle">
+          <FolderAdd />
+        </el-icon>
+        <span style="vertical-align: middle">增加</span>
+      </el-button>
+      <el-button type="primary" @click="multiDelBtnClick">
+        <el-icon style="vertical-align: middle">
+          <Delete />
+        </el-icon>
+        <span style="vertical-align: middle">删除</span>
+      </el-button>
+      <!--条件搜索-->
+      <el-form ref="refsearchForm" :inline="true" class="demo-searchForm ml-2">
+         #queryItem()
+      </el-form>
+      <!--查询按钮-->
+      <el-button type="primary" @click="searchBtnClick">查询</el-button>
+    </div>
+    <!--表格和分页-->
+    <el-table
+      id="resetElementDialog"
+      ref="refuserTable"
+      :height="`calc(100vh - ${settings.delWindowHeight})`"
+      border
+      :data="usertableData"
+      @selection-change="handleSelectionChange"
+    >
+     #tableColumnItem()
+      <!--点击操作-->
+      <el-table-column fixed="right" align="center" label="操作" width="180">
+        <template #default="{ row }">
+          <el-button type="text" size="small" @click="tableEditClick(row)">编辑</el-button>
+          <el-button type="text" size="small" @click="tableDetailClick(row)">详情</el-button>
+          <el-button type="text" size="small" @click="tableDelClick(row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!--分页-->
+    <div class="block columnCC mt-2">
+      <el-pagination
+        :current-page="pageNum"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalPage"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+    <!--详情-->
+    <el-dialog v-model="detailDialog" :title="dialogTitle" width="500px" :close-on-click-modal="false">
+      <div class="detail-container rowBC">
+        <div class="detail-container-item">品牌名称：{{ detailData.name }}</div>
+      </div>
+      <div class="detail-container rowBC">
+        <div class="detail-container-item">品牌首字母：{{ detailData.letter }}</div>
+      </div>
+      <div class="detail-container rowBC">
+        <div class="detail-container-item">排序：{{ detailData.seq }}</div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="detailDialog = false">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <CRUDForm v-if="showFrom" ref="refCRUDForm" @hideComp="hideComp" @selectPageReq="selectPageReq" />
+  </div>
+</template>
+<script>
+export default {
+  name: 'Brand'
+}
+</script>
+<script setup>
+import { Delete, FolderAdd } from '@element-plus/icons-vue'
+/*1.初始化引入和实例化*/
+import settings from '@/settings'
+import CRUDForm from './CRUDForm.vue'
+/*2.表格操作和查询*/
+let multipleSelection = ref([])
+const handleSelectionChange = (val) => {
+  multipleSelection.value = val
+}
+let usertableData = ref([])
+let searchForm = reactive({
+  #fromDataProp()
+})
+onMounted(() => {
+  selectPageReq()
+})
+
+let { startEndArr, totalPage } = useCommon()
+#selectPageReq()
+import tablePageHook from '@/hooks/useTablePage'
+let { pageNum, pageSize, handleCurrentChange, handleSizeChange } = tablePageHook(selectPageReq)
+#queryScript()
+const searchBtnClick = () => {
+  //此处要重置页数，也是常出的bug
+  pageNum.value = 1
+  selectPageReq()
+}
+//删除相关
+let { elMessage, elConfirm } = useElement()
+#multiDelReq()
+#deleteByIdReq()
+//添加和修改
+let showFrom = ref(false)
+const refCRUDForm = ref(null)
+let addBtnClick = () => {
+  showFrom.value = true
+  nextTick(() => {
+    refCRUDForm.value.showModal()
+  })
+}
+
+const hideComp = () => {
+  showFrom.value = false
+}
+let tableEditClick = (row) => {
+  getDetailByIdReq(row.id).then((resData) => {
+    showFrom.value = true
+    nextTick(() => {
+      refCRUDForm.value.showModal(true, resData.data)
+    })
+  })
+}
+/*3.详情modal*/
+#detailScript()
+</script>
+
+<style scoped lang="scss">
+/*详情*/
+.detail-container {
+  flex-wrap: wrap;
+}
+
+.detail-container-item {
+  min-width: 40%;
+  margin-bottom: 20px;
+}
+
+.detailDialog-title {
+  margin-bottom: 14px;
+  font-weight: bold;
+  font-size: 16px;
+}
+</style>

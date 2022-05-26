@@ -44,7 +44,5 @@ spring:
         server-addr: @nacosIpPort@
         weight: @nacosWeight@
 
-
-
 server:
   port: ${envpt.tomcatPortPre}0106

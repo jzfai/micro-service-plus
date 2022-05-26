@@ -1,0 +1,217 @@
+##生成form item
+#parse("utils/utils.vm")
+#macro(formTemp)
+    #foreach($item in $formConfig)
+        #if($item.componentType=="input") ##input
+        <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}" >
+            <el-input v-model="subFrom.${item.field}" style="width:${item.width}px" placeholder="${item.desc}"/>
+        </el-form-item>
+        #elseif($item.componentType=="textarea") ##textarea
+        <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-input
+                    v-model="subFrom.${item.field}"
+                    type="textarea"
+                    maxlength="100"
+                    show-word-limit
+                    autosize
+                    resize="none"
+                    clearable
+                    style="width:${item.width}px"
+                    placeholder="请输入${item.desc}"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="select") ##select
+        <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
+            <el-select v-model="subFrom.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
+                #foreach($enum in $item.selectEnum)
+                    <el-option label="${enum.desc}" value="${enum.value}"/>
+                #end
+            </el-select>
+        </el-form-item>
+        #elseif($item.componentType=="selectApi") ##select
+        <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
+            <el-select v-model="subFrom.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
+                #foreach($enum in $item.selectEnum)
+                    <el-option label="${enum.desc}" value="${enum.value}"/>
+                #end
+            </el-select>
+        </el-form-item>
+        #elseif($item.componentType=="radio") ##radio
+        <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-radio-group v-model="subFrom.${item.field}">
+                #foreach($enum in $item.selectEnum)
+                    <el-radio label="${enum.value}">${enum.desc}</el-radio>
+                #end
+            </el-radio-group>
+        </el-form-item>
+        #elseif($item.componentType=="checkbox") ##checkbox
+        <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-checkbox-group v-model="form.type">
+                #foreach($enum in $item.selectEnum)
+                    <el-checkbox label="${enum.value}"/>
+                #end
+            </el-checkbox-group>
+        </el-form-item>
+        #elseif($item.componentType=="switch") ##switch
+        <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-switch
+                    v-model="subFrom.${item.field}"
+                    inline-prompt
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    active-text="0"
+                    inactive-text="1"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="cascader") ##cascader
+        <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
+            <el-cascader :options="options" clearable filterable :show-all-levels="false" style="width:${item.width}px"/>
+        </el-form-item>
+        #elseif($item.componentType=="datetimerange") ##datetimerange
+        <el-form-item prop="${item.field}">
+            <el-date-picker
+                    v-model="datetimerangePaking"
+                    type="datetimerange"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    @change="dateTimePacking"
+                    style="width:${item.width}px"
+                    range-separator="-"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="datetime") ##datetime
+        <el-form-item prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-date-picker
+                    v-model="dateTimePacking"
+                    type="datetime"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    style="width:${item.width}px"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="date") ##date
+        <el-form-item prop="${item.field}" :rules="formRules.${item.rule}">
+            <el-date-picker
+                    v-model="datePacking"
+                    type="date"
+                    style="width:${item.width}px"
+            />
+        </el-form-item>
+        #elseif($item.componentType=="uploadImage") ##uploadImage
+        <el-form-item prop="${item.field}" :rules="formRules.${item.rule}">
+            <div class="rowSE">
+                <img v-if="subForm.${item.field}" :src="subForm.${item.field}" class="widthPx-120 heightPx-120 border_radius5" />
+                <div :class="[subForm.${item.field} && 'ml-1']" class="rowSS">
+                    <el-button type="primary" @click="goUploadFile">
+                        <i class="el-icon-upload2" />
+                        上传
+                        <input
+                                id="uploadFile"
+                                ref="refSettingFile"
+                                type="file"
+                                ccept=".png, .jpg"
+                                style="display: none"
+                                @change="fileUploadSave"
+                        />
+                    </el-button>
+                    <div class="ml-1">{{ chooseFileName }}</div>
+                </div>
+            </div>
+        </el-form-item>
+        #end
+    #end
+#end
+
+##rule校验
+#macro(rulesData)
+    #foreach($item in $formConfig)
+        #if($item.rule=="notNull")##必填
+            $item.field:{required: true, message:"${item.desc}不能为空",trigger:["blur", "change"]},
+        #elseif ($item.rule=="number")##只允许输入数字
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #elseif ($item.rule=="positiveNumber")##只允许输入正数（允许带两位小数）
+            $item.field:[{required: true, message: "请输入${item.desc}", trigger: "blur"},{pattern: /^[1-9]\d*$/,message: "${item.desc}为正整数",trigger: "blur",}],
+        #end
+    #end
+#end
+##保存请求接口
+#macro(insertReq)
+const insertReq = () => {
+    const data = JSON.parse(JSON.stringify(subForm))
+    delete data.id
+    axiosReq({
+        url: '${apiConfig.insertApi}',
+        data: data,
+        method: '${apiConfig.insertApiType}',
+        bfLoading: true
+    }).then(() => {
+        elMessage('保存成功')
+        emit('selectPageReq')
+        emit('hideComp')
+    })
+}
+#end
+##保存请求接口
+#macro(updateReq)
+const updateReq = () => {
+    return axiosReq({
+        url: '${apiConfig.updateApi}',
+        data: subForm,
+        method: '${apiConfig.updateApiType}',
+        bfLoading: true
+    }).then(() => {
+        elMessage('更新成功')
+        emit('selectPageReq')
+        emit('hideComp')
+    })
+}
+#end
+##上传图片，一张图片
+#macro(fileUploadSave)
+/*上传图片(单张))*/
+const refSettingFile = ref(null)
+const goUploadFile = () => {
+    refSettingFile.value.click()
+}
+const fileUploadSave = () => {
+    const formData = new FormData()
+    formData.append('file', refSettingFile.value.files[0])
+    axiosReq({
+        url: '${commonConfig.upFileApi}',
+        timeout: 30000,
+        data: formData,
+        method: 'post',
+        bfLoading: true,
+        isUploadFile: true
+    })
+    .then((resData) => {
+            let { path } = resData.data
+            // 存储文件名称
+            const filename = refSettingFile.value.value
+            chooseFileName.value = filename.slice(filename.lastIndexOf('\\') + 1)
+            subForm.image = `${import.meta.env.VITE_APP_IMAGE_URL}/${path}`
+            refSettingFile.value = ''
+        })
+        .catch(() => {
+            chooseFileName.value = ''
+            subForm.image = ''
+            refSettingFile.value = ''
+    })
+}
+#end
+##生成form item
+#macro(formScript)
+    #foreach($item in $formConfig)
+      #if($item.componentType=="uploadImage")
+          #fileUploadSave()
+      #elseif($item.componentType=="selectApi") ##selectApi
+      #elseif($item.componentType=="cascader") ##cascader
+      #elseif($item.componentType=="datetimerange") ##datetimerange
+
+      #end
+    #end
+#end
+
+
