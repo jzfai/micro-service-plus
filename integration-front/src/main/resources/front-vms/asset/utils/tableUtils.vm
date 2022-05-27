@@ -1,6 +1,8 @@
 ##表格列项
-#macro(tableColumnItem)
+#macro(tableColumnItemTemp)
+    #if($commonConfig.isTableMulChoose)
     <el-table-column type="selection" align="center" width="50" />
+    #end
     #foreach($item in $tableConfig)
         #if($item.componentType=="input") ##input
         <el-table-column align="center" prop="${item.field}" label="${item.desc}" min-width="${item.width}"/>
@@ -116,4 +118,95 @@ let tableDetailClick = (row) => {
         method: '${apiConfig.detailApiType}'
     })
 }
+#end
+##table操作
+#macro(tableGlobalOperatorTemp)
+    #if($commonConfig.isAdd)
+    <el-button type="primary" @click="addBtnClick">
+        <el-icon style="vertical-align: middle">
+            <FolderAdd />
+        </el-icon>
+        <span style="vertical-align: middle">增加</span>
+    </el-button>
+    #end
+    #if($commonConfig.isMulDelete)
+    <el-button type="primary" @click="multiDelBtnClick">
+        <el-icon style="vertical-align: middle">
+            <Delete />
+        </el-icon>
+        <span style="vertical-align: middle">删除</span>
+    </el-button>
+    #end
+#end
+#macro(tableOperatorTemp)
+    #if($commonConfig.isEdit)
+    <el-button type="text" size="small" @click="tableEditClick(row)">编辑</el-button>
+    #end
+    #if($commonConfig.isDetail)
+    <el-button type="text" size="small" @click="tableDetailClick(row)">详情</el-button>
+    #end
+    #if($commonConfig.isDelete)
+    <el-button type="text" size="small" @click="tableDelClick(row)">删除</el-button>
+    #end
+#end
+##分页
+#macro(tablePaginationTemp)
+<!--分页-->
+<div class="block columnCC mt-2">
+    #if($commonConfig.isPagination)
+        <el-pagination
+                :current-page="pageNum"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="totalPage"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+        />
+    #end
+</div>
+#end
+##详情
+#macro(tableDetailTemp)
+    #if($commonConfig.isDetail)
+    <!--详情-->
+    <el-dialog v-model="detailDialog" :title="dialogTitle" width="500px" :close-on-click-modal="false">
+        #foreach($item in $formConfig)
+            <div class="detail-container rowBC">
+                <div class="detail-container-item">$item.desc：{{ detailData.$item.field }}</div>
+            </div>
+        #end
+        <template #footer>
+            <span class="dialog-footer">
+              <el-button type="primary" @click="detailDialog = false">确 定</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    #end
+#end
+##编辑和添加
+#macro(tableAddEditScript)
+    #if($commonConfig.isEdit)
+    let tableEditClick = (row) => {
+        getDetailByIdReq(row.id).then((resData) => {
+            showFrom.value = true
+            nextTick(() => {
+              refCRUDForm.value.showModal(true, resData.data)
+            })
+        })
+    }
+    #end
+    #if($commonConfig.isAdd)
+        let showFrom = ref(false)
+        const refCRUDForm = ref(null)
+        let addBtnClick = () => {
+            showFrom.value = true
+            nextTick(() => {
+              refCRUDForm.value.showModal()
+            })
+        }
+        const hideComp = () => {
+            showFrom.value = false
+        }
+    #end
 #end

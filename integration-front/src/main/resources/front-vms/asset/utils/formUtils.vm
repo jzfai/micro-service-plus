@@ -4,12 +4,12 @@
     #foreach($item in $formConfig)
         #if($item.componentType=="input") ##input
         <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}" >
-            <el-input v-model="subFrom.${item.field}" style="width:${item.width}px" placeholder="${item.desc}"/>
+            <el-input v-model="subForm.${item.field}" style="width:${item.width}px" placeholder="${item.desc}"/>
         </el-form-item>
         #elseif($item.componentType=="textarea") ##textarea
         <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
             <el-input
-                    v-model="subFrom.${item.field}"
+                    v-model="subForm.${item.field}"
                     type="textarea"
                     maxlength="100"
                     show-word-limit
@@ -22,23 +22,25 @@
         </el-form-item>
         #elseif($item.componentType=="select") ##select
         <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
-            <el-select v-model="subFrom.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
+            <el-select v-model="subForm.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
                 #foreach($enum in $item.selectEnum)
                     <el-option label="${enum.desc}" value="${enum.value}"/>
                 #end
             </el-select>
         </el-form-item>
-        #elseif($item.componentType=="selectApi") ##select
+        #elseif($item.componentType=="selectApi") ##selectApi
         <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
-            <el-select v-model="subFrom.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
-                #foreach($enum in $item.selectEnum)
-                    <el-option label="${enum.desc}" value="${enum.value}"/>
-                #end
+            <el-select v-model="subForm.${item.field}" placeholder="${item.desc}" style="width:${item.width}px">
+                <el-option v-for="item in select${item.field}" :key="item.${item.selectKey}" :label="item.${item.selectLabel}" :value="item.${item.selectKey}" />
             </el-select>
+        </el-form-item>
+        #elseif($item.componentType=="cascader") ##cascader
+        <el-form-item label="${item.desc}" :rules="formRules.${item.rule}">
+            <el-cascader :options="cascade${item.field}" clearable filterable :show-all-levels="false" style="width:${item.width}px"/>
         </el-form-item>
         #elseif($item.componentType=="radio") ##radio
         <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
-            <el-radio-group v-model="subFrom.${item.field}">
+            <el-radio-group v-model="subForm.${item.field}">
                 #foreach($enum in $item.selectEnum)
                     <el-radio label="${enum.value}">${enum.desc}</el-radio>
                 #end
@@ -55,7 +57,7 @@
         #elseif($item.componentType=="switch") ##switch
         <el-form-item label="${item.desc}" prop="${item.field}" :rules="formRules.${item.rule}">
             <el-switch
-                    v-model="subFrom.${item.field}"
+                    v-model="subForm.${item.field}"
                     inline-prompt
                     active-color="#13ce66"
                     inactive-color="#ff4949"
@@ -70,7 +72,7 @@
         #elseif($item.componentType=="datetimerange") ##datetimerange
         <el-form-item prop="${item.field}">
             <el-date-picker
-                    v-model="datetimerangePaking"
+                    v-model="startEndArr"
                     type="datetimerange"
                     format="YYYY-MM-DD HH:mm:ss"
                     value-format="YYYY-MM-DD HH:mm:ss"
@@ -111,7 +113,7 @@
                                 id="uploadFile"
                                 ref="refSettingFile"
                                 type="file"
-                                ccept=".png, .jpg"
+                                accept=".png, .jpg"
                                 style="display: none"
                                 @change="fileUploadSave"
                         />
@@ -123,7 +125,6 @@
         #end
     #end
 #end
-
 ##rule校验
 #macro(rulesData)
     #foreach($item in $formConfig)
@@ -207,11 +208,65 @@ const fileUploadSave = () => {
       #if($item.componentType=="uploadImage")
           #fileUploadSave()
       #elseif($item.componentType=="selectApi") ##selectApi
+      //下拉数据选择
+      let select${item.field} = ref([])
+      const select${item.field}Req = () => {
+          let reqConfig = {
+              url: '${item.queryApi}',
+              method: '${item.queryApiType}'
+          }
+          axiosReq(reqConfig).then((resData) => {
+             select${item.field}.value = resData.data
+          })
+      }
       #elseif($item.componentType=="cascader") ##cascader
+      //级联数据处理
+      let cascade${item.field} = ref([])
+      const cascadeProps = {
+          multiple: false,
+          value: '${item.value}',
+          label: '${item.label}',
+          children: '${item.children}'
+      }
+      const cascade${item.field}Req = () => {
+          let reqConfig = {
+              url: '${item.queryApi}',
+              method: '${item.queryApiType}'
+          }
+          axiosReq(reqConfig).then((resData) => {
+             cascade${item.field}.value = resData.data
+          })
+      }
+      const handleCascade = (data) => {
+          console.log(data)
+      }
       #elseif($item.componentType=="datetimerange") ##datetimerange
-
+      //时间packing
+      const dateTimePacking = (timeArr) => {
+          if (timeArr && timeArr.length === 2) {
+              subForm.startTime = timeArr[0]
+              subForm.endTime = timeArr[1]
+          } else {
+              subForm.startTime = ''
+              subForm.endTime = ''
+          }
+      }
       #end
     #end
 #end
+##onMouted需要调用的请求
+#macro(onMountedScript)
+    #macro(onMountedScript)
+    onMounted(()=>{
+        #foreach($item in $queryConfig)
+            #if($item.componentType=="selectApi")##selectApi
+            select${item.field}Req()
+            #elseif($item.componentType=="cascader") ##cascader
+            cascade${item.field}Req()
+            #end
+        #end
+    })
+    #end
 
+#end
 

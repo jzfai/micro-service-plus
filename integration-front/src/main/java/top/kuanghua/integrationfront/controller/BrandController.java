@@ -1,6 +1,7 @@
 package top.kuanghua.integrationfront.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,23 +11,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import top.kuanghua.integrationfront.entity.Brand;
 import top.kuanghua.integrationfront.service.BrandService;
+import top.kuanghua.integrationfront.utils.FrontVmsUtils;
 import top.kuanghua.khcomomon.entity.KHCommonParams;
 import top.kuanghua.khcomomon.entity.ResResult;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.*;
 
 @Api(tags = "品牌表(Brand)")
 @RestController
 @RequestMapping("brand")
 public class BrandController {
-
     @Resource
     private BrandService brandService;
-
     /**
      * 分页查询所有数据
-     *
      * @param brand 查询实体
      * @return 所有数据
      */
@@ -70,6 +73,10 @@ public class BrandController {
     public ResResult selectById(@RequestParam("id") Integer id) {
         return new ResResult().success(this.brandService.selectById(id));
     }
+
+
+
+
 
     /**
      * @Description: 根据id数组查询品牌列表
@@ -118,6 +125,7 @@ public class BrandController {
     public ResResult deleteBatchIds(@RequestBody List<Long> idList) {
         return new ResResult().success(this.brandService.deleteBatchIds(idList));
     }
+
 
     @DeleteMapping("deleteById")
     @ApiOperation(value = "根据id数组删除数据")

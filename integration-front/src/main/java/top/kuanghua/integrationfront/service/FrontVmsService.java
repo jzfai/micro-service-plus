@@ -61,13 +61,13 @@ public class FrontVmsService {
         context.put("formConfig", jsonData.get("formConfig"));
         context.put("commonConfig", jsonData.get("commonConfig"));
         Template template = FrontVmsUtils.getAssetTemplate("CRUD.vm");
-        FileWriter fileWriter = new FileWriter(FrontVmsUtils.exportVmsPath() + "CRUD.vue");
+        FileWriter fileWriter = new FileWriter("D:\\Roaming\\" + "CRUD.vue");
         template.merge(context, fileWriter);
         fileWriter.close();
 
         //第二个模板
         Template addModal = FrontVmsUtils.getAssetTemplate("CRUDForm.vm");
-        FileWriter addModalWriter = new FileWriter(FrontVmsUtils.exportVmsPath() + "CRUDForm.vue");
+        FileWriter addModalWriter = new FileWriter( "D:\\Roaming\\"+ "CRUDForm.vue");
         addModal.merge(context, addModalWriter);
         addModalWriter.close();
 

@@ -17,19 +17,17 @@
         #elseif($item.componentType=="selectApi") ##selectApi
         <el-form-item  prop="${item.field}">
             <el-select v-model="searchForm.${item.field}" clearable placeholder="${item.desc}"  style="width:${item.width}px">
-                #foreach($enum in $item.selectEnum)
-                    <el-option label="${enum.label}" value="${enum.value}" />
-                #end
+                <el-option v-for="item in select${item.field}" :key="item.${item.selectKey}" :label="item.${item.selectLabel}" :value="item.${item.selectKey}" />
             </el-select>
         </el-form-item>
         #elseif($item.componentType=="cascader") ##cascader
         <el-form-item label="${item.desc}">
-            <el-cascader :options="options" clearable filterable :show-all-levels="false" style="width:${item.width}px"/>
+            <el-cascader :options="cascade${item.field}" clearable filterable :show-all-levels="false" style="width:${item.width}px"/>
         </el-form-item>
         #elseif($item.componentType=="datetimerange") ##datetimerange
         <el-form-item  prop="${item.field}">
             <el-date-picker
-                    v-model="datetimerangePaking"
+                    v-model="startEndArr"
                     type="datetimerange"
                     format="YYYY-MM-DD HH:mm:ss"
                     value-format="YYYY-MM-DD HH:mm:ss"
@@ -61,13 +59,40 @@
         #end
     #end
 #end
-
-
 ##生成queryScript
 #macro(queryScript)
     #foreach($item in $queryConfig)
         #if($item.componentType=="selectApi")##selectApi
+        let select${item.field} = ref([])
+        const select${item.field}Req = () => {
+            let reqConfig = {
+                url: '${item.queryApi}',
+                method: '${item.queryApiType}',
+            }
+        axiosReq(reqConfig).then((resData) => {
+            select${item.field}.value = resData.data
+          })
+        }
         #elseif($item.componentType=="cascader") ##cascader
+        let cascade${item.field} = ref([])
+        const cascadeProps = {
+            multiple: false,
+            value: '${item.value}',
+            label: '${item.label}',
+            children: '${item.children}'
+        }
+        const cascade${item.field}Req = () => {
+            let reqConfig = {
+                url: '${item.queryApi}',
+                method: '${item.queryApiType}'
+            }
+            axiosReq(reqConfig).then((resData) => {
+              cascade${item.field}.value = resData.data
+            })
+        }
+        const handleCascade = (data) => {
+             console.log(data)
+        }
         #elseif($item.componentType=="datetimerange") ##datetimerange
         const dateTimePacking = (timeArr) => {
             if (timeArr && timeArr.length === 2) {
@@ -80,4 +105,17 @@
         }
         #end
     #end
+#end
+##onMouted需要调用的请求
+#macro(onMountedScript)
+onMounted(()=>{
+    selectPageReq()
+    #foreach($item in $queryConfig)
+        #if($item.componentType=="selectApi")##selectApi
+        select${item.field}Req()
+        #elseif($item.componentType=="cascader") ##cascader
+        cascade${item.field}Req()
+        #end
+    #end
+})
 #end

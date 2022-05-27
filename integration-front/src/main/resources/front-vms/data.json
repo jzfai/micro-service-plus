@@ -1,8 +1,16 @@
 {
   "commonConfig": {
     "name": "品牌",
+    "": "品牌",
     "idKey": "id",
-    "upFileApi": "/ty-example/upload/file"
+    "upFileApi": "/ty-example/upload/file",
+    "isAdd": true,
+    "isDelete": true,
+    "isMulDelete": true,
+    "isEdit": true,
+    "isPagination": true,
+    "isDetail": true,
+    "isTableMulChoose": true
   },
   "apiConfig": {
     "queryApi": "/integration-front/brand/selectPage",
@@ -24,6 +32,37 @@
       "desc": "品牌名字",
       "width": 100,
       "componentType": "input"
+    },
+    {
+      "field": "select",
+      "desc": "select",
+      "width": 100,
+      "componentType": "select",
+      "selectKey":"id",
+      "selectLabel":"label",
+      "queryApi":"/integration-front/VmsTemplate/selectApiDemo",
+      "queryApiType":"get"
+    },
+    {
+      "field": "selectApi",
+      "desc": "selectApi",
+      "width": 100,
+      "componentType": "selectApi",
+      "selectKey":"id",
+      "selectLabel":"label",
+      "queryApi":"/integration-front/VmsTemplate/selectApiDemo",
+      "queryApiType":"get"
+    },
+    {
+      "field": "cascader",
+      "desc": "cascader",
+      "width": 100,
+      "componentType": "cascader",
+      "value":"value",
+      "label":"label",
+      "children":"children",
+      "queryApi":"/integration-front/VmsTemplate/cascadeApiDemo",
+      "queryApiType":"get"
     },
     {
       "field": "createTime",
@@ -72,6 +111,29 @@
   ],
   "formConfig": [
     {
+      "field": "selectApi",
+      "desc": "selectApi",
+      "width": 100,
+      "componentType": "selectApi",
+      "selectKey":"id",
+      "selectLabel":"label",
+      "queryApi":"/integration-front/VmsTemplate/selectApiDemo",
+      "queryApiType":"get",
+      "rule": "isNotNull"
+    },
+    {
+      "field": "cascader",
+      "desc": "cascader",
+      "width": 100,
+      "componentType": "cascader",
+      "value":"value",
+      "label":"label",
+      "children":"children",
+      "queryApi":"/integration-front/VmsTemplate/cascadeApiDemo",
+      "queryApiType":"get",
+      "rule": "isNotNull"
+    },
+    {
       "field": "name",
       "desc": "品牌名称",
       "componentType": "input",
@@ -89,7 +151,10 @@
       "field": "carTypeList",
       "desc": "可兼容车型",
       "componentType": "select",
-      "selectEnum":[{"desc":"未出库","value":"0"},{"desc":"已出库","value":"1"}],
+      "selectEnum": [
+        { "desc": "未出库", "value": "0" },
+        { "desc": "已出库", "value": "1" }
+      ],
       "rule": "isNotNull",
       "width": 200
     },

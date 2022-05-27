@@ -39,7 +39,6 @@ let confirmBtnClick = () => {
     }
   })
 }
-
 #insertReq()
 //修改
 const reshowData = (row) => {
@@ -71,6 +70,8 @@ let closeFormModal = () => {
   emit('hideComp')
 }
 #formScript()
+
+#onMountedScript()
 //导出给refs使用
 defineExpose({
   showModal
